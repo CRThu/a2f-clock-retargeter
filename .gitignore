@@ -1,0 +1,38 @@
+# ==============================================================================
+# Git Ignore for Vivado & A2F Constraint Analyzer
+# ==============================================================================
+
+# Vivado 日志与运行过程文件 (Logs & Journals)
+*.log
+*.jou
+vivado*.backup.log
+vivado*.backup.jou
+webtalk*
+*.str
+
+# Vivado 运行时产生的临时隐藏目录与报告
+.Xil/
+hd_visual/
+planAhead*
+
+# 临时与备份文件
+*.tmp
+*.bak
+*.swp
+*~
+
+# 操作系统自动生成文件 (Windows / macOS)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# 编辑器与 IDE 配置
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+
+*.xdc

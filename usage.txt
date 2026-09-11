@@ -1,0 +1,26 @@
+# ==============================================================================
+# A2F Clock Retargeter 极简使用指南
+# ==============================================================================
+
+# 【模式 1】双击运行（最简便，支持鼠标拖拽工程）
+# 直接双击 a2f.bat，控制台会提示:
+# "Please drag and drop your .xpr file into this window and press ENTER:"
+# -> 从文件管理器将目标 .xpr 拖入控制台窗口并回车即可！
+# -> 10 秒内在目标工程同级目录下生成 auto_clock_fix.xdc。
+
+# ------------------------------------------------------------------------------
+
+# 【模式 2】命令行带参调用
+# 语法: a2f.bat <工程路径.xpr> [最小时钟扇出:默认4]
+D:\Projects\constraint_analyzer\a2f.bat D:\Projects\fm577\fm577_verify\fm577_verify_v2\fm577_vivado.xpr 4
+
+# 或者通过原生 Vivado 批处理调用:
+vivado -mode batch -notrace -source D:/Projects/constraint_analyzer/auto_run_retarget.tcl -tclargs <工程路径.xpr>
+
+# ------------------------------------------------------------------------------
+
+# 【模式 3】Vivado GUI 内部交互式调用
+# 若已在 Vivado 界面中，在 Tcl Console 执行:
+synth_design -rtl -name rtl_1
+source D:/Projects/constraint_analyzer/clk_retarget.tcl
+retarget_clock_xdc "auto_clock_fix.xdc" 4

@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <style>
+    .bg { fill: #ffffff; stroke: #d0d7de; stroke-width: 1; }
+    .card { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 1.5; rx: 8px; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #1f2328; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #0969da; }
+    .label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 12px; fill: #1f2328; }
+    .label-bold { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #1f2328; }
+    .pin { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 10px; font-weight: bold; fill: #57606a; }
+    .text-dim { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11px; fill: #57606a; }
+    .text-green { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11px; fill: #1a7f37; font-weight: bold; }
+    .text-red { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11px; fill: #cf222e; font-weight: bold; }
+    .text-blue { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11px; fill: #0969da; font-weight: bold; }
+    .wire-clk { stroke: #0969da; stroke-width: 2; fill: none; }
+    .wire-fast { stroke: #1a7f37; stroke-width: 2; fill: none; }
+    .wire-data { stroke: #cf222e; stroke-width: 2; fill: none; }
+  </style>
+
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0969da" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#cf222e" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1a7f37" />
+    </marker>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect x="0" y="0" width="960" height="480" rx="8" class="bg" />
+
+  <!-- Main Title -->
+  <text x="480" y="32" text-anchor="middle" class="title">ASIC 门控时钟移植到 FPGA 的物理时序踩踏原理 (Hold Violation)</text>
+
+  <!-- ==================== LEFT PANEL (Intra-Domain Fabric Skew) ==================== -->
+  <g transform="translate(25, 52)">
+    <rect x="0" y="0" width="440" height="405" class="card" />
+    <text x="20" y="28" class="subtitle">【电路物理拓扑】门控网络内部走线偏斜 (Fabric Skew)</text>
+
+    <!-- Source Box: Gated Clock Driver -->
+    <rect x="18" y="65" width="80" height="36" rx="4" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5" />
+    <text x="58" y="81" text-anchor="middle" class="label-bold" font-size="11">门控驱动源</text>
+    <text x="58" y="93" text-anchor="middle" class="text-dim" font-size="9">(LUT / 门控引脚)</text>
+
+    <!-- Wire from Driver to Split Node -->
+    <path d="M 98 83 L 115 83" class="wire-clk" />
+    <circle cx="115" cy="83" r="3.5" fill="#0969da" />
+
+    <!-- UPPER BRANCH: Near Path (1.0ns) to DFF 1 -->
+    <path d="M 115 83 L 135 83" class="wire-fast" marker-end="url(#arrow-green)" />
+    <!-- Near Delay Box -->
+    <rect x="135" y="66" width="78" height="34" rx="4" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5" />
+    <text x="174" y="81" text-anchor="middle" class="text-green" font-size="10">Fabric 近端走线</text>
+    <text x="174" y="93" text-anchor="middle" class="text-green" font-size="9">延时 1.0ns</text>
+
+    <!-- Wire from Near Delay to DFF 1 CLK -->
+    <path d="M 213 83 L 235 83" class="wire-fast" marker-end="url(#arrow-green)" />
+
+    <!-- DFF 1 Box -->
+    <rect x="235" y="50" width="85" height="66" rx="5" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5" />
+    <text x="277" y="68" text-anchor="middle" class="label-bold">DFF 1</text>
+    <text x="277" y="104" text-anchor="middle" class="text-dim">近端发送</text>
+    <!-- CLK Pin Triangle at y=83 -->
+    <polygon points="235,78 243,83 235,88" fill="#1a7f37" />
+    <text x="245" y="86" class="pin">CLK</text>
+    <text x="313" y="86" class="pin" text-anchor="end">Q</text>
+
+    <!-- DATA PATH: From DFF 1 (Q at 320, 83) to DFF 2 (D at 355, 218) -->
+    <path d="M 320 83 L 338 83 L 338 218 L 355 218" class="wire-data" stroke-dasharray="4,3" marker-end="url(#arrow-red)" />
+    <!-- Data Speed Badge in clean middle channel -->
+    <rect x="264" y="136" width="124" height="24" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.2" />
+    <text x="326" y="152" text-anchor="middle" class="text-red">极速数据 0.8ns 到达</text>
+
+    <!-- LOWER BRANCH: Far Path (3.2ns, Skew +2.2ns) to DFF 2 -->
+    <path d="M 115 83 L 115 255 L 135 255" class="wire-clk" marker-end="url(#arrow-blue)" />
+
+    <!-- Far Delay Box (Centered at y=255) -->
+    <rect x="135" y="238" width="165" height="34" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5" />
+    <text x="217" y="252" text-anchor="middle" class="text-dim" font-size="11">Fabric 远端走线 (延时 3.2ns)</text>
+    <text x="217" y="265" text-anchor="middle" class="text-red" font-size="10">分支偏斜 Skew = +2.2ns!</text>
+
+    <!-- Wire from Far Delay to DFF 2 CLK -->
+    <path d="M 300 255 L 355 255" class="wire-clk" marker-end="url(#arrow-blue)" />
+
+    <!-- DFF 2 Box (D at y=218, CLK at y=255) -->
+    <rect x="355" y="195" width="75" height="75" rx="5" fill="#ffffff" stroke="#cf222e" stroke-width="1.5" />
+    <!-- D Pin -->
+    <text x="362" y="222" class="pin">D</text>
+    <!-- CLK Pin Triangle at y=255 -->
+    <polygon points="355,250 363,255 355,260" fill="#0969da" />
+    <text x="366" y="258" class="pin">CLK</text>
+    <text x="392" y="224" text-anchor="middle" class="label-bold">DFF 2</text>
+    <text x="392" y="242" text-anchor="middle" class="text-dim">远端接收</text>
+
+    <!-- Separator Line -->
+    <line x1="20" y1="285" x2="420" y2="285" stroke="#d0d7de" stroke-width="1" />
+
+    <!-- Bottom Summary Notes -->
+    <text x="20" y="310" class="label-bold">【物理本质：无时钟树平衡的域内偏斜】</text>
+    <text x="20" y="332" class="text-dim">• 走线不对称：到近端 1.0ns，到远端 3.2ns，分支偏斜高达 2.2ns！</text>
+    <text x="20" y="352" class="text-red">• 域内踩踏：1.0ns + 0.8ns = 1.8ns 数据已变，远端时钟 3.2ns 才到！</text>
+    <text x="20" y="372" class="text-dim">• A2F 作用：声明 create_clock，驱动布线器在数据线上自动垫延时修 Hold。</text>
+  </g>
+
+  <!-- ==================== RIGHT PANEL (Row 1: CLK_1, Row 2: CLK_2, Row 3: Data_2) ==================== -->
+  <g transform="translate(485, 52)">
+    <rect x="0" y="0" width="445" height="405" class="card" />
+    <text x="20" y="28" class="subtitle">【时序波形】同一门控域内时钟跑输给数据</text>
+
+    <!-- ROW 1: DFF 1 Clock (Near End, 1.0ns Edge) -->
+    <text x="20" y="70" class="text-green">DFF 1 时钟 (近端)</text>
+    <path d="M 120 72 L 160 72 L 160 50 L 200 50 L 200 72 L 415 72" class="wire-fast" />
+    <!-- 1.0ns trigger vertical dash -->
+    <line x1="160" y1="44" x2="160" y2="235" stroke="#1a7f37" stroke-width="1.2" stroke-dasharray="3,2" />
+    <text x="160" y="40" text-anchor="middle" class="text-green" font-size="10">1.0ns 发送沿</text>
+
+    <!-- ROW 2: DFF 2 Clock (Far End, 3.2ns Edge, Skew +2.2ns) -->
+    <text x="20" y="132" class="text-blue">DFF 2 时钟 (远端)</text>
+    <path d="M 120 134 L 350 134 L 350 112 L 390 112 L 390 134 L 415 134" class="wire-clk" />
+    <!-- 3.2ns trigger vertical dash -->
+    <line x1="350" y1="106" x2="350" y2="235" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="3,2" />
+    <text x="350" y="104" text-anchor="middle" class="text-red" font-size="10">3.2ns 迟到沿 (偏斜 +2.2ns)</text>
+
+    <!-- ROW 3: DFF 2 Data Bus (Arrival at 1.0 + 0.8 = 1.8ns) -->
+    <text x="20" y="200" class="text-red">DFF 2 数据输入端</text>
+
+    <!-- 1.8ns Data Arrival indicator text above data bus -->
+    <text x="230" y="174" text-anchor="middle" class="text-red" font-size="10">1.8ns 新数据到达 (1.0+0.8ns)</text>
+    <line x1="230" y1="178" x2="230" y2="235" stroke="#cf222e" stroke-width="1" stroke-dasharray="2,2" />
+
+    <!-- Data Bus: Old Data Hex (y: 184 to 208, center: 196) -->
+    <polygon points="120,184 222,184 230,196 222,208 120,208" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5" />
+    <text x="170" y="200" text-anchor="middle" class="label" font-size="11" fill="#0969da" font-weight="bold">上一拍旧数据</text>
+
+    <!-- Data Bus: New Data Hex -->
+    <polygon points="230,196 238,184 415,184 415,208 238,208" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5" />
+    <text x="290" y="200" text-anchor="middle" class="text-red" font-size="11">新数据已覆盖</text>
+    <text x="385" y="200" text-anchor="middle" class="text-dim" font-size="10">(采样错码)</text>
+
+    <!-- Sampling Instant Marker at (350, 196) on Data Bus -->
+    <circle cx="350" cy="196" r="4.5" fill="#cf222e" />
+    <circle cx="350" cy="196" r="8.5" fill="none" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="2,2" />
+
+    <!-- Hold Violation text label directly below the sampling marker -->
+    <text x="350" y="226" text-anchor="middle" class="text-red" font-size="11" font-weight="bold">Hold 违例采样点</text>
+
+    <!-- Separator Line -->
+    <line x1="20" y1="285" x2="425" y2="285" stroke="#d0d7de" stroke-width="1" />
+
+    <!-- Bottom Summary Notes -->
+    <text x="20" y="310" class="label-bold">【为什么会出错？】</text>
+    <text x="20" y="332" class="text-dim">1. 域内时钟迟到 3.2ns，旧数据早在 1.8ns 已被覆盖，采样到错误数据。</text>
+    <text x="20" y="352" class="text-dim">2. 裕量 Slack = Tdata - Tskew - Thold &lt; 0，公式无周期参数，降频无用！</text>
+    <text x="20" y="372" class="text-dim">3. 未加约束时 Vivado 忽略门控域内分析，报表全绿掩盖严重硬件死锁。</text>
+  </g>
+</svg>
